@@ -68,7 +68,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
@@ -85,7 +84,42 @@ class Apiservice {
       ),
     );
 
-  // static Future<Map<String, dynamic>> userLogin(
+  static Future<Map<String, dynamic>?> userLogin(
+    String email,
+    String password,
+  ) async {
+    Response? response;
+    try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Mobile-Request': 'Secure',
+      };
+      response = await _dio.post(
+        'https://hr.esoftmm.com/core/api/auth/access-token',
+        data: {'username': email, 'password': password, 'device': 'android'},
+        options: Options(headers: headers),
+      );
+      return {'success': true, 'data': response.data};
+    } on DioException catch (e) {
+      if (e.error is SocketException) {
+        return {'message': 'no internet connection'};
+      } else if (e.response!.data != null) {
+        return e.response!.data;
+      } else {
+        return {'message': 'something went wrong'};
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+// static Future<Map<String, dynamic>> userLogin(
   //   String email,
   //   String password,
   // ) async {
@@ -109,39 +143,3 @@ class Apiservice {
   //     };
   //   }
   // }
-
-  static Future<Response?> userLogin(String email, String password) async {
-    Response? response;
-    try {
-      var headers = {
-        'Content-Type': 'application/json',
-        'Mobile-Request': 'Secure',
-      };
-      response = await _dio.post(
-        'https://hr.esoftmm.com/core/api/auth/access-token',
-        data: {'username': email, 'password': password, 'device': 'android'},
-        options: Options(headers: headers),
-      );
-      return response;
-    } on DioException catch (e) {
-      if (e.error is SocketException) {
-        print("❌ No Internet Connection");
-      } else if (e.type == DioExceptionType.connectionTimeout) {
-        print("❌ Connection Timeout");
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        print("❌ Receive Timeout");
-      } else {
-        print("❌ Dio Error: ${e.message}");
-      }
-    } catch (e) {
-      debugPrint('ErrorLog ${e.toString()}');
-      debugPrint('ErrorLog ${response}');
-
-      return Response(
-        requestOptions: RequestOptions(),
-        statusCode: 404,
-        statusMessage: "Plse",
-      );
-    }
-  }
-}

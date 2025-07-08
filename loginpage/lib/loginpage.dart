@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:loginpage/apiservice.dart';
 
@@ -52,7 +51,7 @@ class _LoginpageState extends State<Loginpage> {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(left: 30),
+                padding: const EdgeInsets.only(left: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -130,9 +129,8 @@ class _LoginpageState extends State<Loginpage> {
                       _passwordcontroller.text,
                     );
 
-                    _showErrorDialog(
-                      "Status code ${result!.statusCode.toString()}\n statusmesagee ${result.statusMessage.toString()}",
-                    );
+                    _showErrorDialog('${result!['message']}');
+
                     // if (result['success']) {
                     // } else {
                     //   return _showErrorDialog(result['message']);
@@ -161,7 +159,7 @@ class _LoginpageState extends State<Loginpage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 10, left: 230),
+              padding: const EdgeInsets.only(top: 10, left: 180),
               child: Text('Forgot password?'),
             ),
           ],

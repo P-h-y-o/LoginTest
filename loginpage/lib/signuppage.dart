@@ -83,7 +83,7 @@ class _LoginpageState extends State<Signuppage> {
                 ),
               ),
             ),
-            SizedBox(height: 100),
+            SizedBox(height: 80),
             Form(
               key: _formkey,
               child: Column(
@@ -256,11 +256,16 @@ class _LoginpageState extends State<Signuppage> {
                   ),
                   SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 35),
+                    padding: const EdgeInsets.only(
+                      bottom: 20,
+                      left: 32,
+                      right: 32,
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Already have an account?'),
+                        Spacer(),
                         InkWell(
                           child: Text('Login'),
                           onTap: () {
