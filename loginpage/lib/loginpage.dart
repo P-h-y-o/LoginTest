@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:loginpage/apiservice.dart';
+import 'package:loginpage/homepage.dart';
+import 'package:loginpage/product_model.dart';
+import 'package:loginpage/user_model.dart';
+import 'package:loginpage/user_singleton.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -9,8 +14,18 @@ class Loginpage extends StatefulWidget {
 }
 
 class _LoginpageState extends State<Loginpage> {
-  final TextEditingController _emailcontroller = TextEditingController();
+  final TextEditingController _userNamecontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
+
+  late Box<UserModel> userBox;
+  @override
+  void initState() {
+    super.initState();
+    userBox = Hive.box<UserModel>('userBox');
+    // box = Hive.box('mybox');
+    //  _loadSavedData();
+  }
+
   bool isChecked = false;
   void _showErrorDialog(String message) {
     showDialog(
@@ -86,8 +101,8 @@ class _LoginpageState extends State<Loginpage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: TextField(
-                controller: _emailcontroller,
-                decoration: InputDecoration(hintText: 'Email'),
+                controller: _userNamecontroller,
+                decoration: InputDecoration(hintText: 'Username'),
               ),
             ),
 
@@ -125,13 +140,38 @@ class _LoginpageState extends State<Loginpage> {
                 child: ElevatedButton(
                   onPressed: () async {
                     final result = await Apiservice.userLogin(
-                      _emailcontroller.text,
+                      _userNamecontroller.text,
                       _passwordcontroller.text,
                     );
+                    // if (result!['code'] == 201) {
+                    //   print('result${result['message']}');
+                    //   Navigator.pushNamed(context, '/homescreen');
+                    // }
+                    if (result['success'] == true) {
+                      final data = result['data'];
+                      print(data);
 
-                    _showErrorDialog('${result!['message']}');
+                      final user = UserModel(
+                        id: data['user']['id'],
+                        userName: data['user']['userName'] ?? '',
+                        email: data['user']['email'] ?? '',
+                        phoneNumber: data['user']['phoneNumber'] ?? '',
+                        accessToken: data['access_token'],
+                        refreshToken: data['refresh_token'],
+                      );
+                      await Hive.box<UserModel>(
+                        'userBox',
+                      ).put('currentuser', user);
+                      await Hive.openBox<Product>('favorite_${user.id}');
+                      CurrentUserSingleton().setUser(user);
 
-                    // if (result['success']) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Home()),
+                      );
+                    } else {
+                      _showErrorDialog('${result['message']}');
+                    } // if (result['success']) {
                     // } else {
                     //   return _showErrorDialog(result['message']);
                     // }
